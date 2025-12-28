@@ -10,4 +10,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 //    List of transactions
 //    List<Transaction> findByWalletOrderByCreatedAtDesc(Wallet wallet);
+
+    boolean existsByReferenceId(String referenceId);
 }
