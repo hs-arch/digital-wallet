@@ -1,0 +1,2 @@
+ALTER TABLE transactions
+MODIFY status VARCHAR(20) NOT NULL;
