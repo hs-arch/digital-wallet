@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transactions")
+@Table(
+        name = "transactions",
+        uniqueConstraints = @UniqueConstraint(columnNames = "reference_id")
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,6 +48,6 @@ public class Transaction {
     }
 
     public enum TransactionStatus {
-        SUCCESS, FAILED
+        INITIATED, SUCCESS, FAILED
     }
 }
