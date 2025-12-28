@@ -31,11 +31,22 @@ public class User {
     private String status = "ACTIVE";
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Wallet wallet;
+
+    @PrePersist
+    private void onCreate(){
+        if(createdAt == null){
+            createdAt = LocalDateTime.now();
+        }
+        if(updatedAt == null){
+            updatedAt = LocalDateTime.now();
+        }
+    }
+
 }
