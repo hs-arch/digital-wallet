@@ -7,7 +7,6 @@ import com.hamid.digital_wallet.repository.TransactionRepository;
 import com.hamid.digital_wallet.repository.TransferRepository;
 import com.hamid.digital_wallet.repository.UserRepository;
 import com.hamid.digital_wallet.repository.WalletRepository;
-import jakarta.persistence.OptimisticLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +34,9 @@ public class WalletService {
     public Transaction topUp(String walletId, BigDecimal amount, String referenceId){
 
 //      CHecking if the account balance is sufficient.
-        if(amount.compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("Amount cannot be less than 0.");
-        }
+//        if(amount.compareTo(BigDecimal.ZERO)<=0){
+//            throw new IllegalArgumentException("Amount cannot be less than 0.");
+//        }
 
 //      Checking for existing transaction of the reference Id
         Optional<Transaction> existing = transactionRepository.findByReferenceId(referenceId);
@@ -72,14 +71,14 @@ public class WalletService {
 //    ---------------------- Transaction PAY/DEBIT begins ------------------------
     @Transactional
     public Transaction debit(String walletId, BigDecimal amount ,String referenceId){
-        if(amount.compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("Amount less than 0");
-        }
-
-        Optional<Transaction> existing = transactionRepository.findByReferenceId(referenceId);
-        if(existing.isPresent()){
-            return existing.get();
-        }
+//        if(amount.compareTo(BigDecimal.ZERO)<=0){
+//            throw new IllegalArgumentException("Amount less than 0");
+//        }
+//
+//        Optional<Transaction> existing = transactionRepository.findByReferenceId(referenceId);
+//        if(existing.isPresent()){
+//            return existing.get();
+//        }
 
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(()-> new IllegalArgumentException("Wallet not found."));
 
@@ -115,11 +114,17 @@ public class WalletService {
     }
 //    ---------------------- Transaction DEBIT ends ------------------------
     @Transactional
-    public Transfer transfer(String fromWalletId, String toWalletId, BigDecimal amount, String referenceId) {
+    public void transfer(String fromWalletId, String toWalletId, BigDecimal amount, String referenceId) {
 
         if(amount.compareTo(BigDecimal.ZERO)<=0){
             throw new IllegalArgumentException("Amount has to be greater than zero.");
         }
+
+        if(transactionRepository.existsByReferenceId(referenceId)){
+            return; // means already processed
+        }
+
+
 
 //      DEBIT transaction from wallet.
         Transaction debitTxn = debit(fromWalletId, amount, referenceId+"_DEBIT");
@@ -134,7 +139,7 @@ public class WalletService {
                 .amount(amount)
                 .build();
 
-        return transferRepository.save(transfer);
+        transferRepository.save(transfer);
     }
 
 }
