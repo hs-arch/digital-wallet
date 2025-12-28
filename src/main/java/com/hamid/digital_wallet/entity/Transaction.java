@@ -19,8 +19,9 @@ import java.util.UUID;
 public class Transaction {
 
     @Id
-    @Column(columnDefinition = "CHAR(36)")
-    private String id = UUID.randomUUID().toString();
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
@@ -41,7 +42,7 @@ public class Transaction {
     private String referenceId;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     public enum TransactionType {
         CREDIT, DEBIT
@@ -49,5 +50,10 @@ public class Transaction {
 
     public enum TransactionStatus {
         INITIATED, SUCCESS, FAILED
+    }
+
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
     }
 }
