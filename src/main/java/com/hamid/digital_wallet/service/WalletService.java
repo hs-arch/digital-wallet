@@ -116,13 +116,51 @@ public class WalletService {
     @Transactional
     public void transfer(String fromWalletId, String toWalletId, BigDecimal amount, String referenceId) {
 
-        if(amount.compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("Amount has to be greater than zero.");
+
+        Transaction txn = Transaction.builder()
+                .referenceId(referenceId)
+                .amount(amount)
+                .status(Transaction.TransactionStatus.INITIATED)
+                .type(Transaction.TransactionType.TRANSFER)
+                .build();
+
+        transactionRepository.save(txn);
+
+        try{
+
+            Wallet fromWallet = walletRepository.findByIdForUpdate(fromWalletId);
+            Wallet toWallet = walletRepository.findByIdForUpdate(toWalletId);
+
+            if(fromWallet.getBalance().compareTo(amount)<0){
+                throw new IllegalArgumentException("Amount cannot be less than 0");
+            }
+
+            fromWallet.setBalance(fromWallet.getBalance().subtract(amount));
+            toWallet.setBalance(toWallet.getBalance().add(amount));
+
+            walletRepository.save(fromWallet);
+            walletRepository.save(toWallet);
+
+            txn.setStatus(Transaction.TransactionStatus.SUCCESS);
+            transactionRepository.save(txn);
+
+        }catch(Exception ex){
+            txn.setStatus(Transaction.TransactionStatus.FAILED);
+            transactionRepository.save(txn);
+            throw ex;
         }
 
-        if(transactionRepository.existsByReferenceId(referenceId)){
-            return; // means already processed
-        }
+
+
+//        ------------------------------------------------------------------------------------------------
+
+//        if(amount.compareTo(BigDecimal.ZERO)<=0){
+//            throw new IllegalArgumentException("Amount has to be greater than zero.");
+//        }
+//
+//        if(transactionRepository.existsByReferenceId(referenceId)){
+//            return; // means already processed
+//        }
 
 
 
