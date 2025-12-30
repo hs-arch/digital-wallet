@@ -18,6 +18,6 @@ public interface WalletRepository extends JpaRepository<Wallet, String> {
 //  Prevents race conditions, two concurrent request now cannot write at the same time, leading to consistency or transactions in wallet.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT w FROM Wallet w WHERE w.id = :walletId")
-    Optional<Wallet> findByIdForUpdate(@Param("walletId") Wallet walletId);
+    Wallet findByIdForUpdate(@Param("walletId") String walletId);
 
 }
