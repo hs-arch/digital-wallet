@@ -45,7 +45,7 @@ public class Transaction {
     private LocalDateTime createdAt;
 
     public enum TransactionType {
-        CREDIT, DEBIT
+        CREDIT, DEBIT, TRANSFER
     }
 
     public enum TransactionStatus {
