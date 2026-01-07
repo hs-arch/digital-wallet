@@ -41,15 +41,18 @@ class WalletServiceIT {
         user1.setStatus("ACTIVE");
         user1.setCreatedAt(LocalDateTime.now());
         user1.setUpdatedAt(LocalDateTime.now());
-        user1.setWallet(null);
+        user1.setWallet(null);  // FIX THIS TEST CASE.
 
         user1 = userRepository.saveAndFlush(user1);
 
         Wallet fromWallet = new Wallet();
         fromWallet.setUser(user1);
         fromWallet.setBalance(new BigDecimal("1000"));
-//        fromWallet.getCreatedAt(LocalDateTime.now());
+        fromWallet.setCreatedAt(LocalDateTime.now());
         walletRepository.saveAndFlush(fromWallet);
+
+        user1.setWallet(fromWallet);
+        userRepository.saveAndFlush(user1);
 
         // ---- USER 2 ----
         User user2 = new User();
@@ -66,7 +69,11 @@ class WalletServiceIT {
         Wallet toWallet = new Wallet();
         toWallet.setUser(user2);
         toWallet.setBalance(BigDecimal.ZERO);
+        toWallet.setCreatedAt(LocalDateTime.now());
         walletRepository.saveAndFlush(toWallet);
+
+        user2.setWallet(toWallet);
+        userRepository.saveAndFlush(user2);
 
         // ---- TRANSFER ----
         walletService.transfer(
